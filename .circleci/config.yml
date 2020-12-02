@@ -54,7 +54,7 @@ jobs:
           at: /tmp
       - run:
           name: Deploy app
-          command: echo todo && false
+          command: npx netlify-cli deploy --prod --dir /tmp/server-doc --message "déploiement" --site 901466c7-1926-456d-9ef6-5cedfe5d0d7f
   back-test-unit:
     docker:
       - image: circleci/node:dubnium-browsers
@@ -94,25 +94,25 @@ jobs:
             API_HOST: localhost
             API_PROTOCOL: http
 
-  docker-build-and-push:
-    working_directory: /dockerapp
-    docker:
-      - image: docker:17.05.0-ce-git
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run:
-          name: Build application Docker image
-          command: |
-            docker build --cache-from=app -t app .
-      - deploy:
-          name: Publish application to docker hub
-          command: |
-            docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
-            docker tag app $DOCKER_HUB_USER_ID/my-awesome-ci-expr:$CIRCLE_BUILD_NUM
-            docker tag app $DOCKER_HUB_USER_ID/my-awesome-ci-expr:latest
-            docker push $DOCKER_HUB_USER_ID/my-awesome-ci-expr:$CIRCLE_BUILD_NUM
-            docker push $DOCKER_HUB_USER_ID/my-awesome-ci-expr:latest
+#  docker-build-and-push:
+#    working_directory: /dockerapp
+#    docker:
+#      - image: docker:17.05.0-ce-git
+#    steps:
+ #     - checkout
+ #     - setup_remote_docker
+ #     - run:
+ #         name: Build application Docker image
+ #         command: |
+ #           docker build --cache-from=app -t app .
+ #     - deploy:
+ #         name: Publish application to docker hub
+ #         command: |
+ #           docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
+ #           docker tag app $DOCKER_HUB_USER_ID/my-awesome-ci-expr:$CIRCLE_BUILD_NUM
+ #           docker tag app $DOCKER_HUB_USER_ID/my-awesome-ci-expr:latest
+ #           docker push $DOCKER_HUB_USER_ID/my-awesome-ci-expr:$CIRCLE_BUILD_NUM
+ #           docker push $DOCKER_HUB_USER_ID/my-awesome-ci-expr:latest
 
   back-deploy-heroku:
     docker:
@@ -121,10 +121,10 @@ jobs:
       - checkout
       - run:
           name: Heroku Deploy
-          command: echo todo && false
+          command: git push https://heroku:5f976f6c-4d3d-47f7-b33e-c64757c330f1@git.heroku.com/vast-cliffs-53337.git HEAD:main
       - run:
           name: Smoke Test
-          command: echo todo && false
+          command: ./test.sh
 
 workflows:
   version: 2
@@ -140,15 +140,15 @@ workflows:
       - lint:
           requires:
             - build
-      - docker-build-and-push:
-          requires:
-            - build
-            - lint
-            - back-test-e2e
-            - back-test-unit
-          filters:
-            branches:
-              only: main
+#      - docker-build-and-push:
+#          requires:
+#            - build
+#            - lint
+#            - back-test-e2e
+#            - back-test-unit
+#          filters:
+#            branches:
+#              only: main
       - back-deploy-heroku:
           requires:
             - build
