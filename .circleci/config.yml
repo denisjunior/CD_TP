@@ -124,7 +124,7 @@ jobs:
           command: git push https://heroku:5f976f6c-4d3d-47f7-b33e-c64757c330f1@git.heroku.com/vast-cliffs-53337.git HEAD:main
       - run:
           name: Smoke Test
-          command:./test.sh
+          command: ./test.sh
 
 workflows:
   version: 2
